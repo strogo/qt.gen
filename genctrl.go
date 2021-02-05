@@ -111,6 +111,13 @@ func (this *GenCtrl) setupLang() {
 		this.qtfuncgen = NewGenerateGov2(genQtdir, genQtver)
 		this.qttmplgen = NewGenerateGov2(genQtdir, genQtver)
 		this.qtconstgen = NewGenerateGov2(genQtdir, genQtver)
+	case "cy": // generate methods call with no wrapper, sret
+		this.filter = &GenFilterGo{}
+		this.genor = NewGenerateCy(genQtdir, genQtver)
+		this.qtenumgen = NewGenerateCy(genQtdir, genQtver)
+		this.qtfuncgen = NewGenerateCy(genQtdir, genQtver)
+		this.qttmplgen = NewGenerateCy(genQtdir, genQtver)
+		this.qtconstgen = NewGenerateCy(genQtdir, genQtver)
 	case "rs":
 		this.filter = &GenFilterGo{}
 		this.genor = NewGenerateRs(genQtdir, genQtver)
