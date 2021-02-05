@@ -402,7 +402,7 @@ func (this *GenerateV) genImportsWithcp(cp *CodePager, cursor, parent clang.Curs
 	cp.APf("keep", "  // if false {reflect.TypeOf(123)}")
 	cp.APf("keep", "  // if false {reflect.TypeOf(vsafe.sizeof(0))}")
 	cp.APf("keep", "  // if false {fmt.println(123)}")
-	cp.APf("keep", "  if false {/*log.println(123)*/}")
+	cp.APf("keep", "  // if false {log.println(123)}")
 	cp.APf("keep", "  if false {qtrt.keepme()}")
 	for _, dep := range modDeps[modname] {
 		cp.APf("keep", "if false {qt%s.keepme()}", dep)
