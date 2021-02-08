@@ -57,9 +57,8 @@ func (this *GenerateCy) genTemplateInstant(tmplClsCursor, argClsCursor clang.Cur
 	// tmplArgClsName := argClsCursor.Spelling()
 	// tmplClsName := tmplClsCursor.Spelling()
 
-	this.cp.APf("body", "pub struct %s  {", argClsCursor.Spelling())
-	this.cp.APf("body", "    // *qtrt.CObject")
-	this.cp.APf("body", "  pub mut: cthis voidptr")
+	this.cp.APf("body", "struct %s  {", argClsCursor.Spelling())
+	this.cp.APf("body", "    *qtrt.CObject")
 	this.cp.APf("body", "}")
 
 	this.mthidxs = map[string]int{}
@@ -121,15 +120,15 @@ func (this *GenerateCy) genTemplateMethod(cursor, parent clang.Cursor, argClsCur
 
 	retstr := getTyDesc(cursor.ResultType(), AsVReturn, cursor)
 	cp.APf("body", "// %s %s", cursor.ResultType().Spelling(), cursor.DisplayName())
-	cp.APf("body", "type TC_%s_%s_%d = fn(voidptr) %s",
+	cp.APf("body", "type TC_%s_%s_%d = func(voidptr) %s",
 		clsName, validMethodName, midx, retstr)
-	cp.APf("body", "pub fn (this %s) %s%d() %s {",
+	cp.APf("body", "func (this *%s) %s%d() *%s {",
 		clsName, validMethodName, midx, retytxt)
 	cp.APf("body", "    // %s_%s_%d()", clsName, validMethodName, midx)
 	cp.APf("body", "    // rv, err := qtrt.InvokeQtFunc6(\"C_%s_%s_%d\", qtrt.FFI_TYPE_POINTER, this.Cthis)", clsName, validMethodName, midx)
 	cp.APf("body", "    // qtrt.ErrPrint(err, rv)")
-	cp.APf("body", "    mut fnobj := TC_%s_%s_%d(0)", clsName, validMethodName, midx)
-	cp.APf("body", "    fnobj = qtrt.sym_cfunc6(\"C_%s_%s_%d\")",
+	cp.APf("body", "    fnobj := TC_%s_%s_%d(0)", clsName, validMethodName, midx)
+	cp.APf("body", "    fnobj = qtrt.symQtfunc6(\"C_%s_%s_%d\")",
 		clsName, validMethodName, midx)
 	if rety.Kind() != clang.Type_Void {
 		cp.APf("body", "    rv :=")

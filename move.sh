@@ -53,6 +53,13 @@ function mvgosrc()
     # multimedia
     cp -a src/multimedia/*.go ~/oss/qt.go/qtmultimedia/
     cp -a src/svg/*.go ~/oss/qt.go/qtsvg/
+
+    rm -f ~/oss/qt.go/qtcore/qfunctions.go
+    rm -f ~/oss/qt.go/qtgui/qfunctions.go
+    rm -f ~/oss/qt.go/qtwidgets/qfunctions.go
+    rm -f ~/oss/qt.go/qtcore/qvariantmap.go
+    rm -f ~/oss/qt.go/qtcore/qvarianthash.go
+    rm -f ~/oss/qt.go/qtwidgets/qwidgetset.go
 }
 
 function mvbymd5()

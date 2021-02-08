@@ -41,7 +41,7 @@ func NewGenerateCy(qtdir, qtver string) *GenerateCy {
 	this.qtdir, this.qtver = qtdir, qtver
 	this.filter = &GenFilterGo{}
 	this.mangler = NewGoMangler()
-	this.tyconver = NewTypeConvertGo()
+	this.tyconver = NewTypeConvertCy()
 
 	this.GenBase.funcMangles = map[string]int{}
 
@@ -432,7 +432,7 @@ func (this *GenerateCy) genClassDef(cursor, parent clang.Cursor) {
 	this.cp.APf("body", "}\n")
 
 	// genTypeInterface, genTypeITF
-	this.cp.APf("body", "interface %sITF {", cursor.Spelling())
+	this.cp.APf("body", "type %sITF interface {", cursor.Spelling())
 	for _, bc := range bcs {
 		this.cp.APf("body", "//    %s%sITF", calc_package_prefix(cursor, bc), bc.Type().Spelling())
 		// break
@@ -667,10 +667,10 @@ func (this *GenerateCy) genMethodSignature(cursor, parent clang.Cursor, midx int
 	case clang.Cursor_Constructor:
 		prms := funk.Map(this.destArgDesc, func(s string) string { return strings.Split(s, " ")[0] })
 		prmStr := strings.Join(prms.([]string), ", ")
-		cp.APf("body", "func (dummy %s) new_for_inherit_%s(%s) %s {",
+		cp.APf("body", "func (dummy *%s) new_for_inherit_%s(%s) *%s {",
 			strings.Title(parent.Spelling()), overloadSuffix, argStr, parent.Spelling())
 		cp.APf("body", "  //return new%s%s(%s)", cursor.Spelling(), overloadSuffix, prmStr)
-		cp.APf("body", "  return %s{}", cursor.Spelling())
+		cp.APf("body", "  return &%s{}", cursor.Spelling())
 		cp.APf("body", "}")
 
 		cp.APf("body", "func new%s%s(%s) *%s {",
@@ -714,10 +714,10 @@ func (this *GenerateCy) genMethodSignatureDv(cursor, parent clang.Cursor, midx i
 	case clang.Cursor_Constructor:
 		prms := funk.Map(this.destArgDesc, func(s string) string { return strings.Split(s, " ")[0] })
 		prmStr := strings.Join(prms.([]string), ", ")
-		cp.APf("body", "func (dummy %s) new_for_inherit_%s(%s) *%s {",
+		cp.APf("body", "func (dummy *%s) new_for_inherit_%s(%s) *%s {",
 			strings.Title(parent.Spelling()), overloadSuffix, argStr, parent.Spelling())
 		cp.APf("body", "  //return new%s%s(%s)", cursor.Spelling(), overloadSuffix, prmStr)
-		cp.APf("body", "  return *%s{}", cursor.Spelling())
+		cp.APf("body", "  return &%s{}", cursor.Spelling())
 		cp.APf("body", "}")
 
 		cp.APf("body", "func new%s%s(%s) *%s {",
@@ -946,7 +946,7 @@ func (this *GenerateCy) genYaCtorFromPointer(cursor, parent clang.Cursor, midx i
 		return
 	}
 	// can use ((*Qxxx)nil).NewFromPointer
-	this.cp.APf("body", "func (dummy %s) newFromptr(cthis voidptr) *%s {",
+	this.cp.APf("body", "func (dummy *%s) newFromptr(cthis voidptr) *%s {",
 		cursor.Spelling(), cursor.Spelling())
 	this.cp.APf("body", "    return new%sFromptr(cthis)", cursor.Spelling())
 	this.cp.APf("body", "}")
@@ -1795,7 +1795,7 @@ func (this *GenerateCy) genRetFFI(cursor, parent clang.Cursor, midx int) {
 			barety := get_bare_type(rety)
 			cp.APf("body", "    rv2 := %snew%sFromptr(voidptr(rv)) // 333",
 				pkgPrefix, barety.Spelling())
-			cp.APf("body", "    qtrt.setFinalizer(&rv2, %sdelete%s)", pkgPrefix, barety.Spelling())
+			cp.APf("body", "    qtrt.setFinalizer(rv2, %sdelete%s)", pkgPrefix, barety.Spelling())
 			cp.APf("body", "    return rv2")
 			cp.APf("body", "    //return %s%s{rv}", pkgPrefix, barety.Spelling())
 		} else {
@@ -1970,8 +1970,8 @@ func (this *GenerateCy) genClassEnums(cursor, parent clang.Cursor) {
 
 				_ = elems
 				//this.cp.APf("body", "// %s", elems[c1.DisplayName()])
-				this.cp.APf("body", "  %s = %d",
-					//cursor.DisplayName(),
+				this.cp.APf("body", "  %s_%s = %d",
+					cursor.DisplayName(),
 					c1.DisplayName(),
 					c1.EnumConstantDeclValue())
 			}
